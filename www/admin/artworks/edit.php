@@ -3,6 +3,25 @@ session_start();
 require_once '../../includes/config.php';
 require_once '../../includes/functions.php';
 
+// Функция транслитерации (русские буквы → латиница)
+function transliterate($string) {
+    $trans = array(
+        'а' => 'a', 'б' => 'b', 'в' => 'v', 'г' => 'g', 'д' => 'd', 'е' => 'e',
+        'ё' => 'e', 'ж' => 'zh', 'з' => 'z', 'и' => 'i', 'й' => 'y', 'к' => 'k',
+        'л' => 'l', 'м' => 'm', 'н' => 'n', 'о' => 'o', 'п' => 'p', 'р' => 'r',
+        'с' => 's', 'т' => 't', 'у' => 'u', 'ф' => 'f', 'х' => 'h', 'ц' => 'c',
+        'ч' => 'ch', 'ш' => 'sh', 'щ' => 'sch', 'ъ' => '', 'ы' => 'y', 'ь' => '',
+        'э' => 'e', 'ю' => 'yu', 'я' => 'ya',
+        'А' => 'A', 'Б' => 'B', 'В' => 'V', 'Г' => 'G', 'Д' => 'D', 'Е' => 'E',
+        'Ё' => 'E', 'Ж' => 'Zh', 'З' => 'Z', 'И' => 'I', 'Й' => 'Y', 'К' => 'K',
+        'Л' => 'L', 'М' => 'M', 'Н' => 'N', 'О' => 'O', 'П' => 'P', 'Р' => 'R',
+        'С' => 'S', 'Т' => 'T', 'У' => 'U', 'Ф' => 'F', 'Х' => 'H', 'Ц' => 'C',
+        'Ч' => 'Ch', 'Ш' => 'Sh', 'Щ' => 'Sch', 'Ъ' => '', 'Ы' => 'Y', 'Ь' => '',
+        'Э' => 'E', 'Ю' => 'Yu', 'Я' => 'Ya'
+    );
+    return strtr($string, $trans);
+}
+
 // Проверяем авторизацию и роль художника
 if (!isLoggedIn() || getUserRole() != 'artist') {
     header('Location: ../../login.php');
@@ -115,7 +134,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 mkdir($target_dir, 0777, true);
             }
             
-            $image_name = time() . '_' . basename($_FILES["image"]["name"]);
+            // Транслитерируем имя файла
+            $image_name = time() . '_' . transliterate(basename($_FILES["image"]["name"]));
             $target_file = $target_dir . $image_name;
             
             $check = getimagesize($_FILES["image"]["tmp_name"]);
@@ -164,7 +184,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $pdo->commit();
                 
                 $_SESSION['success'] = "Работа успешно обновлена!";
-                header('Location: index.php');
+                header('Location: /portfolio.php');
                 exit;
                 
             } catch (Exception $e) {

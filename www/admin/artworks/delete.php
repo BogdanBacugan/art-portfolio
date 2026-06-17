@@ -30,5 +30,5 @@ if ($work) {
     $_SESSION['message'] = "Работа удалена";
 }
 
-header('Location: index.php');
+header('Location: /portfolio.php');
 exit;
